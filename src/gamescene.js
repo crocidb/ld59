@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 
 import Input from "./input.js";
 import Time from "./time.js";
@@ -61,6 +63,35 @@ class GameScene {
     this.obj.castShadow = true;
     this.obj.position.set(0, 0.5, 0);
     this.scene.add(this.obj);
+
+    // Load emitter model
+    const loader = new GLTFLoader();
+
+    loader.load("/assets/emitter.glb", (gltf) => {
+      this.emitter = gltf.scene;
+      this.emitter.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+      this.emitter.position.set(0, 1, 0);
+      this.scene.add(this.emitter);
+    });
+
+      loader.load("/assets/canon.glb", (gltf) => {
+      this.canon = gltf.scene;
+      this.canon.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+      this.canon.position.set(2, 1, 0);
+      this.scene.add(this.canon);
+    });
+
+
   }
 
   update() {
