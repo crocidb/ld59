@@ -1,0 +1,13 @@
+{
+  "name": "ld59",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "http-server -p 8087 -c-1"
+  },
+  "dependencies": {
+    "three": "^0.184.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
