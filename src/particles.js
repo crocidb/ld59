@@ -3,7 +3,7 @@ import * as THREE from "three";
 import Time from "./time.js";
 import * as utils from "./utils.js";
 
-const PREALLOC_PARTICLES = 100;
+const PREALLOC_PARTICLES = 200;
 
 class ParticleSystem {
   constructor(prealloc = 10) {
@@ -68,10 +68,10 @@ class ParticleEmitter {
     this.scene = null;
 
     this.geometry = new THREE.BoxGeometry(0.05, 0.05, 0.05);
-    this.material = new THREE.MeshStandardMaterial({
-      color: 0xeeeeee,
-      roughness: 0.4,
-      metalness: 0.1,
+    this.material = new THREE.MeshBasicMaterial({
+      color: 0x99eeee,
+      transparent: true,
+      opacity: 0.8
     });
 
     this.mesh = new THREE.InstancedMesh(

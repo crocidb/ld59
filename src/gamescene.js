@@ -98,7 +98,7 @@ class GameScene {
 
   update() {
     if (Input.instance.iskeydown(Input.SPACE)) {
-      ParticleSystem.instance.burst(new THREE.Vector3(0, 0, 0), 80, 2.0, 1.0);
+      ParticleSystem.instance.burst(new THREE.Vector3(0, 0, 0), 250, 1.2, 1.0);
     }
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
