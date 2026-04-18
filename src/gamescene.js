@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import Input from "./input.js";
-import Time from "./time.js";
 import ParticleSystem from "./particles.js";
 import Board from "./board.js";
 import Emitter from "./emitter.js";
@@ -14,6 +13,10 @@ class GameScene {
     ParticleSystem.instance.init(this.scene);
 
     this.currentLevel = LEVEL_DATA[0];
+    this.currentSelected = null;
+
+    // HUD
+    this.hudSelectionTitle = document.querySelector("#hud_selection h1");
 
     // CAMERA
     this.camera = new THREE.PerspectiveCamera(
@@ -49,10 +52,14 @@ class GameScene {
     );
     this.scene.add(this.board.board);
 
-    this._fitCameraToBoard(this.currentLevel.board.width, this.currentLevel.board.height);
+    this._fitCameraToBoard(
+      this.currentLevel.board.width,
+      this.currentLevel.board.height,
+    );
 
-    this.emitter = new Emitter(this.board, 2, 2);
-    this.canon = new Canon(this.board, 2, 5);
+    this.pawns = [];
+    this.pawns.push(new Emitter(this.board, 0, 0));
+    this.pawns.push(new Canon(this.board, 2, 5));
 
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2(-9999, -9999);
@@ -67,7 +74,8 @@ class GameScene {
     const vFov = THREE.MathUtils.degToRad(this.camera.fov);
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * this.camera.aspect);
     const halfCamZ = boardHeight / (2 * Math.SQRT2);
-    const distForWidth = (boardWidth / 2) / Math.tan(hFov / 2) + halfCamZ * Math.SQRT2;
+    const distForWidth =
+      boardWidth / 2 / Math.tan(hFov / 2) + halfCamZ * Math.SQRT2;
     const distForDepth = halfCamZ / Math.tan(vFov / 2) + halfCamZ * Math.SQRT2;
     const D = Math.max(distForWidth, distForDepth) * 1.1;
     this.camera.position.set(0, D / Math.SQRT2, -D / Math.SQRT2);
@@ -76,12 +84,33 @@ class GameScene {
 
   update() {
     if (Input.instance.iskeydown(Input.SPACE)) {
-      ParticleSystem.instance.burst(new THREE.Vector3(0,0,0), 80, 2.0, 1.0);
+      ParticleSystem.instance.burst(new THREE.Vector3(0, 0, 0), 80, 2.0, 1.0);
     }
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const hits = this.raycaster.intersectObjects(this.board.squares);
-    this.board.setHovered(hits.length > 0 ? hits[0].object : null);
+    this.board.update(this.raycaster);
+
+    this.updateInput();
+    this.updateHud();
+  }
+
+  updateInput() {
+    this.currentSelected = null;
+    if (this.board.currentSelected != null) {
+      for (let p of this.pawns) {
+        if (p.iscoordinate(this.board.currentSelected)) {
+          this.currentSelected = p;
+          break;
+        }
+      }
+    }
+  }
+
+  updateHud() {
+    this.hudSelectionTitle.innerHTML = "Empty Square";
+    if (this.currentSelected != null) {
+      this.hudSelectionTitle.innerHTML = this.currentSelected.name;
+    }
   }
 }
 

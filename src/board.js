@@ -6,11 +6,13 @@ class Board {
     this.height = height;
     this.board = new THREE.Group();
     this.squares = [];
+    this.currentSelected = null;
 
-    const offset = {
+    this.offset = {
       x: (width - 1) / 2,
-      z: (height - 1) / 2
+      z: (height - 1) / 2,
     };
+    const offset = this.offset;
     const squareGeometry = new THREE.BoxGeometry(1, 0.1, 1);
     const lightMaterial = new THREE.MeshStandardMaterial({
       color: 0xeeeed2,
@@ -45,13 +47,23 @@ class Board {
     this.board.add(this.hoverIndicator);
   }
 
+  update(raycaster) {
+    const hits = raycaster.intersectObjects(this.squares);
+    this.setHovered(hits.length > 0 ? hits[0].object : null);
+  }
+
   setHovered(square) {
     if (square) {
       this.hoverIndicator.visible = true;
       this.hoverIndicator.position.x = square.position.x;
       this.hoverIndicator.position.z = square.position.z;
+      this.currentSelected = {
+        x: (this.width - 1) - Math.round(square.position.x + this.offset.x),
+        y: Math.round(square.position.z + this.offset.z),
+      };
     } else {
       this.hoverIndicator.visible = false;
+      this.currentSelected = null;
     }
   }
 }

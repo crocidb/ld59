@@ -1,10 +1,11 @@
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 class Pawn {
-  constructor(board, modelPath, x, z) {
+  constructor(board, modelPath, x, y) {
     this.board = board;
     this.x = x;
-    this.z = z;
+    this.y = y;
+    this.name = "";
     this.mesh = null;
 
     const loader = new GLTFLoader();
@@ -24,14 +25,18 @@ class Pawn {
 
   _applyPosition() {
     const offsetX = (this.board.width - 1) / 2;
-    const offsetZ = (this.board.height - 1) / 2;
-    this.mesh.position.set(this.x - offsetX, 0.6, this.z - offsetZ);
+    const offsetY = (this.board.height - 1) / 2;
+    this.mesh.position.set((this.board.width - 1 - this.x) - offsetX, 0.6, this.y - offsetY);
   }
 
-  moveTo(x, z) {
+  moveTo(x, y) {
     this.x = x;
-    this.z = z;
+    this.y = y;
     if (this.mesh) this._applyPosition();
+  }
+
+  iscoordinate(coord) {
+    return coord.x == this.x && coord.y == this.y;
   }
 }
 
