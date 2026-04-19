@@ -38,6 +38,7 @@ class System {
     }
     if (this.composer) this.composer.setSize(w, h);
     if (this.crtPass) this.crtPass.uniforms.resolution.value.set(w, h);
+    if (this.currentScene && this.currentScene.resize) this.currentScene.resize(w, h);
   }
 
   start() {

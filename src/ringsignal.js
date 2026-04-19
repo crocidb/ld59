@@ -25,12 +25,16 @@ class RingSignal {
       linewidth: this.linewidth,
       transparent: true,
       opacity: 1.0,
-      resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
+      resolution: new THREE.Vector2(1, 1),
     });
 
     this.line = new Line2(this.geometry, this.material);
     this.line.visible = false;
     this.triggered = new Set();
+  }
+
+  resize(w, h) {
+    this.material.resolution.set(w, h);
   }
 
   emit(origin) {

@@ -27,7 +27,7 @@ class GameScene {
     // CAMERA
     this.camera = new THREE.PerspectiveCamera(
       40,
-      window.innerWidth / window.innerHeight,
+      canvas.clientWidth / canvas.clientHeight,
       0.1,
       100,
     );
@@ -81,6 +81,14 @@ class GameScene {
     });
 
     window.addEventListener("click", this._click.bind(this));
+  }
+
+  resize(w, h) {
+    for (const p of this.pawns) {
+      if (p.rings) {
+        for (const ring of p.rings) ring.resize(w, h);
+      }
+    }
   }
 
   _fitCameraToBoard(boardWidth, boardHeight) {

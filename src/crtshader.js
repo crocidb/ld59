@@ -4,7 +4,7 @@ const CRTShader = {
   uniforms: {
     tDiffuse: { value: null },
     time: { value: 0 },
-    resolution: { value: new THREE.Vector2(1280, 768) },
+    resolution: { value: new THREE.Vector2(0, 0) },
   },
 
   vertexShader: /* glsl */`

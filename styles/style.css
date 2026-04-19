@@ -26,6 +26,13 @@ canvas {
   height: 768px;
 }
 
+@media (pointer: coarse) {
+  #gamediv {
+    width: 100vw;
+    height: 100dvh;
+  }
+}
+
 #hud {
   position: absolute;
   top: 0;
