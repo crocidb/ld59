@@ -34,9 +34,7 @@ class Canon extends Pawn {
     this.life = this.maxLife;
 
     this.initialScaleY = 0.6;
-    this.flashIntensity = 0;
-
-    this._spriteWorldPos = new THREE.Vector3();
+    this._flashColor = new THREE.Color(SIGNAL_COLORS[receiverType]);
 
     this._spriteCanvas = document.createElement("canvas");
     this._spriteCanvas.width = 64;
@@ -106,6 +104,7 @@ class Canon extends Pawn {
 
   _updateReceiverVisuals() {
     this.description = `Receiver: ${SIGNAL_LABELS[this.receiverType]}`;
+    this._flashColor = new THREE.Color(SIGNAL_COLORS[this.receiverType]);
     this._redrawSpriteCanvas();
   }
 
@@ -118,6 +117,7 @@ class Canon extends Pawn {
     if (!this.mesh) return;
 
     this.flashIntensity = 1.5;
+    this._flashColor.set(SIGNAL_COLORS[this.receiverType]);
 
     const { dx, dy } = ORIENTATION_DELTAS[this.orientation];
     const nx = this.x + dx;
@@ -133,6 +133,7 @@ class Canon extends Pawn {
   rotate() {
     this.orientation = (this.orientation + 1) % 4;
     this.flashIntensity = 1.5;
+    this._flashColor.set(SIGNAL_COLORS[this.receiverType]);
     this.mesh.scale.y = 1.2;
     if (this.mesh) this.mesh.rotation.y = ORIENTATIONS[this.orientation].rotY;
   }
@@ -148,6 +149,7 @@ class Canon extends Pawn {
 
     this.mesh.scale.y = 0.5;
     this.flashIntensity = 1.5;
+    this._flashColor.set(SIGNAL_COLORS[this.receiverType]);
 
     ParticleSystem.instance.burst(this.mesh.position.clone().add(burstOffset), 30, .7, 1.0, 0xffaa55);
 
@@ -169,20 +171,6 @@ class Canon extends Pawn {
     }
 
     this.mesh.scale.y = utils.lerp(this.mesh.scale.y, this.initialScaleY, Time.instance.dt() * 9.0);
-
-    this.flashIntensity = utils.lerp(this.flashIntensity, 0, Time.instance.dt() * 9.0);
-    this.mesh.traverse((child) => {
-      if (child.isMesh && child.material) {
-        child.material.emissive = new THREE.Color(SIGNAL_COLORS[this.receiverType]).multiplyScalar(this.flashIntensity);
-      }
-    });
-
-    if (this.camera) {
-      this.sprite.getWorldPosition(this._spriteWorldPos);
-      const dist = this.camera.position.distanceTo(this._spriteWorldPos);
-      const k = 0.06;
-      this.sprite.scale.set(dist * k, dist * k * (84 / 64), 1);
-    }
   }
 }
 

@@ -1,4 +1,7 @@
+import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import Time from "./time.js";
+import * as utils from "./utils.js";
 
 export const SIGNAL_LABELS = ["Disabled", "Shoot", "Move", "Rotate"];
 export const SIGNAL_COLORS = [0x888888, 0x55ddff, 0x55ffaa, 0xff7799];
@@ -30,6 +33,13 @@ class Pawn {
     this.mesh = null;
     this.maxLife = 0;
     this.life = 0;
+    this.camera = null;
+    this.sprite = null;
+    this._spriteWorldPos = new THREE.Vector3();
+    this._spriteScale = 0.06;
+    this.flashIntensity = 0;
+    this._flashColor = new THREE.Color(0xffffff);
+    this._flashDecay = 9.0;
 
     const loader = new GLTFLoader();
     loader.load(modelPath, (gltf) => {
@@ -64,6 +74,9 @@ class Pawn {
 
   takeDamage(amount) {
     this.life = Math.max(0, this.life - amount);
+    this.flashIntensity = 1.5;
+    this._flashColor.set(0xff2200);
+    if (this.mesh) this.mesh.scale.y = 1.4;
     if (this._redrawSpriteCanvas) this._redrawSpriteCanvas();
   }
 
@@ -81,6 +94,19 @@ class Pawn {
 
   update() {
     this._update();
+    if (this.camera && this.sprite && this.mesh) {
+      this.sprite.getWorldPosition(this._spriteWorldPos);
+      const dist = this.camera.position.distanceTo(this._spriteWorldPos);
+      this.sprite.scale.set(dist * this._spriteScale, dist * this._spriteScale * (84 / 64), 1);
+    }
+    if (this.mesh && this.flashIntensity > 0) {
+      this.flashIntensity = utils.lerp(this.flashIntensity, 0, Time.instance.dt() * this._flashDecay);
+      this.mesh.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.material.emissive = this._flashColor.clone().multiplyScalar(this.flashIntensity);
+        }
+      });
+    }
   }
 }
 

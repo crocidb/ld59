@@ -16,8 +16,6 @@ class Emitter extends Pawn {
     this.rate = rate;
     this.camera = camera;
 
-    this._spriteWorldPos = new THREE.Vector3();
-
     this.maxLife = 5;
     this.life = this.maxLife;
 
@@ -48,7 +46,9 @@ class Emitter extends Pawn {
 
     this.initialScaleY = 0.6;
     this.rateCounter = 0;
-    this.flashIntensity = 0;
+    this._spriteScale = 0.055;
+    this._flashColor = new THREE.Color(SIGNAL_COLORS[this.type]);
+    this._flashDecay = 10.0;
   }
 
   _redrawSpriteCanvas() {
@@ -126,6 +126,7 @@ class Emitter extends Pawn {
       ring.emit(this.mesh.position.clone().add(new THREE.Vector3(0, 0.5, 0)));
       this.mesh.scale.y = 0.8;
       this.flashIntensity = 1.2;
+      this._flashColor.set(SIGNAL_COLORS[this.type]);
     }
   }
 
@@ -156,25 +157,6 @@ class Emitter extends Pawn {
         this.initialScaleY,
         Time.instance.dt() * 9.0,
       );
-
-      this.flashIntensity = utils.lerp(
-        this.flashIntensity,
-        0,
-        Time.instance.dt() * 10.0,
-      );
-      const signalColor = new THREE.Color(SIGNAL_COLORS[this.type]);
-      this.mesh.traverse((child) => {
-        if (child.isMesh && child.material) {
-          child.material.emissive = signalColor.clone().multiplyScalar(this.flashIntensity);
-        }
-      });
-
-      if (this.camera) {
-        this.sprite.getWorldPosition(this._spriteWorldPos);
-        const dist = this.camera.position.distanceTo(this._spriteWorldPos);
-        const k = 0.055;
-        this.sprite.scale.set(dist * k, dist * k * (84 / 64), 1);
-      }
     }
   }
 }
