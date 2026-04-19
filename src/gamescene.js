@@ -90,7 +90,7 @@ class GameScene {
       this.pawns.push(new Emitter(this.scene, this.board, e.x, e.y, e.type, e.rate, this.camera));
     }
     for (const c of this.currentLevel.canons) {
-      this.pawns.push(new Canon(this.scene, this.board, c.x, c.y, this.camera, c.receiver ?? 1));
+      this.pawns.push(new Canon(this.scene, this.board, c.x, c.y, this.camera, c.receiver ?? 1, c.orientation ?? 0));
     }
     for (const c of (this.currentLevel.enemyCanons ?? [])) {
       this.pawns.push(new EnemyCanon(this.scene, this.board, c.x, c.y, this.camera, c.receiver ?? 1, c.orientation ?? 2));
