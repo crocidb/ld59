@@ -68,7 +68,7 @@ class GameScene {
       this.pawns.push(new Emitter(this.scene, this.board, e.x, e.y, e.type, e.rate, this.camera));
     }
     for (const c of this.currentLevel.canons) {
-      this.pawns.push(new Canon(this.scene, this.board, c.x, c.y, this.camera));
+      this.pawns.push(new Canon(this.scene, this.board, c.x, c.y, this.camera, c.receiver ?? 1));
     }
 
     this.raycaster = new THREE.Raycaster();
@@ -130,7 +130,7 @@ class GameScene {
           const dist = Math.sqrt(dx * dx + dz * dz);
           if (ring.radius >= dist) {
             ring.triggered.add(canon);
-            canon.fire();
+            if (canon.receiverType === 1) canon.fire();
           }
         }
       }
