@@ -77,6 +77,7 @@ class GameScene {
 
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2(-9999, -9999);
+    this._pawnWorldPos = new THREE.Vector3();
 
     window.addEventListener("mousemove", (e) => {
       const rect = canvas.getBoundingClientRect();
@@ -157,6 +158,35 @@ class GameScene {
     }
 
     Bullet.updateAll(this.scene);
+
+    for (const bullet of Bullet.pool) {
+      if (!bullet.active) continue;
+      for (const pawn of this.pawns) {
+        if (!pawn.mesh) continue;
+        if (bullet.owner === pawn) continue;
+        pawn.mesh.getWorldPosition(this._pawnWorldPos);
+        const dx = bullet.position.x - this._pawnWorldPos.x;
+        const dz = bullet.position.z - this._pawnWorldPos.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < bullet.radius + 0.4) {
+          bullet.active = false;
+          this.scene.remove(bullet.mesh);
+          pawn.takeDamage(1);
+          ParticleSystem.instance.burst(bullet.position.clone(), 15, 0.5, 0.8, 0xff4400);
+        }
+      }
+    }
+
+    for (let i = this.pawns.length - 1; i >= 0; i--) {
+      const pawn = this.pawns[i];
+      if (pawn.isDead()) {
+        if (pawn.mesh) {
+          ParticleSystem.instance.burst(pawn.mesh.position.clone(), 60, 1.0, 1.2, 0xff6600);
+          this.scene.remove(pawn.mesh);
+        }
+        this.pawns.splice(i, 1);
+      }
+    }
 
     this.updateInput();
     this.updateHud();

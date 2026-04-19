@@ -28,6 +28,8 @@ class Pawn {
     this.name = "";
     this.description = "";
     this.mesh = null;
+    this.maxLife = 0;
+    this.life = 0;
 
     const loader = new GLTFLoader();
     loader.load(modelPath, (gltf) => {
@@ -58,6 +60,15 @@ class Pawn {
 
   iscoordinate(coord) {
     return coord.x == this.x && coord.y == this.y;
+  }
+
+  takeDamage(amount) {
+    this.life = Math.max(0, this.life - amount);
+    if (this._redrawSpriteCanvas) this._redrawSpriteCanvas();
+  }
+
+  isDead() {
+    return this.maxLife > 0 && this.life <= 0;
   }
 
   action() {

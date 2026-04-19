@@ -30,6 +30,9 @@ class Canon extends Pawn {
     this.receiverType = receiverType;
     this.orientation = orientation;
 
+    this.maxLife = 10;
+    this.life = this.maxLife;
+
     this.initialScaleY = 0.6;
     this.flashIntensity = 0;
 
@@ -37,7 +40,7 @@ class Canon extends Pawn {
 
     this._spriteCanvas = document.createElement("canvas");
     this._spriteCanvas.width = 64;
-    this._spriteCanvas.height = 64;
+    this._spriteCanvas.height = 84;
     this._spriteCtx = this._spriteCanvas.getContext("2d");
 
     this.spriteTexture = new THREE.CanvasTexture(this._spriteCanvas);
@@ -46,12 +49,13 @@ class Canon extends Pawn {
     this.sprite.position.set(0, -.4, 0);
     this.sprite.renderOrder = 999;
 
+    this._iconReady = false;
     this._updateReceiverVisuals();
   }
 
   _redrawSpriteCanvas() {
     const ctx = this._spriteCtx;
-    ctx.clearRect(0, 0, 64, 64);
+    ctx.clearRect(0, 0, 64, 84);
     ctx.fillStyle = SIGNAL_BG_COLORS[this.receiverType];
     ctx.beginPath();
     ctx.arc(32, 32, 26, 0, Math.PI * 2);
@@ -61,19 +65,42 @@ class Canon extends Pawn {
     ctx.stroke();
 
     const img = signalImages[this.receiverType];
-    const drawImg = () => {
+    const drawIcon = () => {
       ctx.save();
       ctx.beginPath();
       ctx.arc(32, 32, 22, 0, Math.PI * 2);
       ctx.clip();
       ctx.drawImage(img, 12, 12, 40, 40);
       ctx.restore();
+      this._iconReady = true;
       this.spriteTexture.needsUpdate = true;
     };
     if (img.complete) {
-      drawImg();
+      drawIcon();
     } else {
-      img.onload = drawImg;
+      img.onload = drawIcon;
+    }
+
+    this._drawLifeBar(ctx);
+    this.spriteTexture.needsUpdate = true;
+  }
+
+  _drawLifeBar(ctx) {
+    const ratio = this.maxLife > 0 ? this.life / this.maxLife : 0;
+    const barX = 4, barY = 68, barW = 56, barH = 8, r = 3;
+
+    ctx.fillStyle = "rgba(20,20,20,0.85)";
+    ctx.beginPath();
+    ctx.roundRect(barX, barY, barW, barH, r);
+    ctx.fill();
+
+    if (ratio > 0) {
+      const g = Math.round(ratio * 200);
+      const red = Math.round((1 - ratio) * 220);
+      ctx.fillStyle = `rgb(${red},${g},30)`;
+      ctx.beginPath();
+      ctx.roundRect(barX, barY, barW * ratio, barH, r);
+      ctx.fill();
     }
   }
 
@@ -136,6 +163,11 @@ class Canon extends Pawn {
       this._spriteAttached = true;
     }
 
+    if (!this._iconReady) {
+      const img = signalImages[this.receiverType];
+      if (img.complete) this._redrawSpriteCanvas();
+    }
+
     this.mesh.scale.y = utils.lerp(this.mesh.scale.y, this.initialScaleY, Time.instance.dt() * 9.0);
 
     this.flashIntensity = utils.lerp(this.flashIntensity, 0, Time.instance.dt() * 9.0);
@@ -149,7 +181,7 @@ class Canon extends Pawn {
       this.sprite.getWorldPosition(this._spriteWorldPos);
       const dist = this.camera.position.distanceTo(this._spriteWorldPos);
       const k = 0.06;
-      this.sprite.scale.set(dist * k, dist * k, 1);
+      this.sprite.scale.set(dist * k, dist * k * (84 / 64), 1);
     }
   }
 }
