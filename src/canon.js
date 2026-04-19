@@ -152,7 +152,6 @@ class Canon extends Pawn {
 
     const { velocity, burstOffset } = ORIENTATIONS[this.orientation];
 
-    utils.play("shoot_deep");
     utils.play("shoot");
 
     const worldPos = new THREE.Vector3();
