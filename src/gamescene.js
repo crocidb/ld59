@@ -30,8 +30,12 @@ class GameScene {
     this._btnHelp = document.getElementById("btn_help");
     this._hudHelp = document.getElementById("hud_help");
     this._hud = document.getElementById("hud");
+    this._helpTitle = document.querySelector("#hud_help h2");
+    this._helpDescription = document.querySelector("#hud_help > p");
 
     this.hudLevelTitle.innerHTML = this.currentLevel.name;
+    this._helpTitle.innerHTML = this.currentLevel.name;
+    this._helpDescription.innerHTML = this.currentLevel.description;
     this._hud.hidden = false;
     this._setupControls();
 
