@@ -25,6 +25,7 @@ class GameScene {
 
     this.currentLevel = LEVEL_DATA[levelIndex];
     this._levelIndex = levelIndex;
+    localStorage.setItem("currentLevel", levelIndex);
     this.currentSelected = null;
     this.paused = false;
     this._helpVisible = false;
@@ -197,6 +198,7 @@ class GameScene {
     this._isLastLevel = this._levelIndex + 1 >= LEVEL_DATA.length;
     this._onNextLevel = () => {
       if (this._isLastLevel) {
+        localStorage.setItem("currentLevel", 0);
         System.instance.setScene(() => new MenuScene(this.canvas));
       } else {
         System.instance.setScene(() => new GameScene(this.canvas, this._levelIndex + 1, true));
@@ -249,7 +251,7 @@ class GameScene {
   _showWin() {
     MusicManager.instance.stop();
     if (this._isLastLevel) {
-      this._hudWinMessage.innerHTML = "You completed all levels!";
+      this._hudWinMessage.innerHTML = "You completed all levels! Thanks for playing!";
       this._btnNextLevel.innerHTML = "Main Menu";
     }
     this._hudWin.classList.remove("hidden");

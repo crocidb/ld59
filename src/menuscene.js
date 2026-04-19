@@ -94,7 +94,9 @@ class MenuScene {
   }
 
   _onStartClick() {
-    System.instance.setScene(() => new GameScene(System.instance.renderer.domElement, 0));
+    const savedLevel = parseInt(localStorage.getItem("currentLevel") ?? "0", 10);
+    const startLevel = isNaN(savedLevel) ? 0 : savedLevel;
+    System.instance.setScene(() => new GameScene(System.instance.renderer.domElement, startLevel));
   }
 
   update() {

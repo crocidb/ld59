@@ -98,9 +98,9 @@ const LEVEL_DATA = [
     stronghold: { x: 0, y: 5 },
   },
   {
-    name: "NEW ONE",
+    name: "Emitters Are Neutral",
     description:
-      "hehe",
+      "Can you do it with only one <b>Canon</b>?",
     board: { width: 9, height: 6 },
     canons: [
       { x: 4, y: 5, receiver: 0, orientation: 2 },
