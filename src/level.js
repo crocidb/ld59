@@ -6,12 +6,13 @@ const LEVEL_DATA = [
     canons: [
       {x: 2, y: 2, receiver: 0},
     ],
-    enemyCanons: [
-      { x: 2, y: 7, receiver: 1, orientation: 2 },
-    ],
     emitters: [
       { x: 2, y: 0, type: 1, rate: 2.2 },
-    ]
+    ],
+    enemyCanons: [
+      { x: 2, y: 6, receiver: 1, orientation: 2 },
+    ],
+    stronghold: { x: 2, y: 9 },
   },
   {
     name: "Level 1",
@@ -20,13 +21,14 @@ const LEVEL_DATA = [
     canons: [
       {x: 2, y: 0, receiver: 0, orientation: 3},
     ],
-    enemyCanons: [
-      { x: 2, y: 7, receiver: 1, orientation: 2 },
-    ],
     emitters: [
       { x: 1, y: 0, type: 1, rate: 2.2 },
       { x: 0, y: 0, type: 3, rate: 6.0 },
-    ]
+    ],
+    enemyCanons: [
+      { x: 0, y: 7, receiver: 1, orientation: 2 },
+    ],
+    stronghold: { x: 2, y: 7 },
   }
 ];
 

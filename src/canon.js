@@ -30,7 +30,7 @@ class Canon extends Pawn {
     this.receiverType = receiverType;
     this.orientation = orientation;
 
-    this.maxLife = 10;
+    this.maxLife = 5;
     this.life = this.maxLife;
 
     this.initialScaleY = 0.6;

@@ -7,6 +7,7 @@ import Emitter from "./emitter.js";
 import Canon from "./canon.js";
 import { SIGNAL_SPRITE_SRCS } from "./pawn.js";
 import EnemyCanon from "./enemycanon.js";
+import Stronghold from "./stronghold.js";
 import Bullet from "./bullet.js";
 import LEVEL_DATA from "./level.js";
 import Time from "./time.js";
@@ -94,6 +95,10 @@ class GameScene {
     }
     for (const c of (this.currentLevel.enemyCanons ?? [])) {
       this.pawns.push(new EnemyCanon(this.scene, this.board, c.x, c.y, this.camera, c.receiver ?? 1, c.orientation ?? 2));
+    }
+    if (this.currentLevel.stronghold) {
+      const s = this.currentLevel.stronghold;
+      this.pawns.push(new Stronghold(this.board, s.x, s.y, this.camera));
     }
 
     this.raycaster = new THREE.Raycaster();

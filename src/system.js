@@ -43,7 +43,7 @@ class System {
   }
 
   start() {
-    this.currentScene = new GameScene(this.renderer.domElement, 1);
+    this.currentScene = new GameScene(this.renderer.domElement, 0);
     this.resize();
 
     const { scene, camera } = this.currentScene;
