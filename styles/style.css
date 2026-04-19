@@ -145,6 +145,59 @@ canvas {
   padding: 4px 8px;
 }
 
+#hud_win {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#hud_win.hidden {
+  display: none;
+}
+
+#hud_win_panel {
+  position: relative;
+  background: #3a4a1a;
+  border: 0;
+  border-radius: 10px;
+  padding: 32px 40px;
+  color: #eeeed2;
+  width: min(420px, 72vw, 72vh);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#hud_win_panel h2 {
+  font-size: 1.8rem;
+  margin: 0 0 12px 0;
+  color: #eeeed2;
+}
+
+#hud_win_panel p {
+  font-size: 0.85rem;
+  margin: 0 0 24px 0;
+}
+
+.win-next-btn {
+  font-size: 1rem;
+  color: #333;
+  padding: 10px 28px;
+  background: #eeeed2;
+  border: 0;
+  display: inline-flex;
+}
+
+.win-next-btn:hover {
+  background: #bbbbc2;
+}
+
 #hud_selection {
   padding-top: 10px;
   margin-right: 10px;

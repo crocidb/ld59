@@ -26,6 +26,7 @@ class GameScene {
     this.currentSelected = null;
     this.paused = false;
     this._helpVisible = false;
+    this._stronghold = null;
 
     // HUD
     this.hudLevelTitle = document.querySelector("#hud_level_title h1");
@@ -36,6 +37,8 @@ class GameScene {
     this._btnPlayPause = document.getElementById("btn_playpause");
     this._btnHelp = document.getElementById("btn_help");
     this._hudHelp = document.getElementById("hud_help");
+    this._hudWin = document.getElementById("hud_win");
+    this._hudWinMessage = document.getElementById("hud_win_message");
     this._hud = document.getElementById("hud");
     this._helpTitle = document.querySelector("#hud_help h2");
     this._helpDescription = document.querySelector("#hud_help_panel > p");
@@ -100,7 +103,8 @@ class GameScene {
     }
     if (this.currentLevel.stronghold) {
       const s = this.currentLevel.stronghold;
-      this.pawns.push(new Stronghold(this.board, s.x, s.y, this.camera));
+      this._stronghold = new Stronghold(this.board, s.x, s.y, this.camera);
+      this.pawns.push(this._stronghold);
     }
 
     this.raycaster = new THREE.Raycaster();
@@ -108,6 +112,7 @@ class GameScene {
     this._pawnWorldPos = new THREE.Vector3();
 
     MusicManager.instance.init();
+    MusicManager.instance.play();
 
     if (showHelp) this._toggleHelp();
 
@@ -180,11 +185,24 @@ class GameScene {
     this._onHelp = () => this._toggleHelp();
 
     this._btnHelpClose = document.getElementById("btn_help_close");
+    this._btnNextLevel = document.getElementById("btn_next_level");
+
+    this._onNextLevel = () => {
+      const nextIndex = this._levelIndex + 1;
+      if (nextIndex < LEVEL_DATA.length) {
+        System.instance.setScene(() => new GameScene(this.canvas, nextIndex, true));
+      } else {
+        this._hudWinMessage.innerHTML = "You completed all levels!";
+        this._btnNextLevel.innerHTML = "Play Again";
+        this._onNextLevel = () => System.instance.setScene(() => new GameScene(this.canvas, 0, true));
+      }
+    };
 
     this._btnPlayPause.addEventListener("click", this._onPlayPause);
     document.getElementById("btn_restart").addEventListener("click", this._onRestart);
     this._btnHelp.addEventListener("click", this._onHelp);
     this._btnHelpClose.addEventListener("click", this._onHelp);
+    this._btnNextLevel.addEventListener("click", this._onNextLevel);
   }
 
   exit() {
@@ -192,11 +210,14 @@ class GameScene {
     document.getElementById("btn_restart").removeEventListener("click", this._onRestart);
     this._btnHelp.removeEventListener("click", this._onHelp);
     this._btnHelpClose.removeEventListener("click", this._onHelp);
+    this._btnNextLevel.removeEventListener("click", this._onNextLevel);
     window.removeEventListener("mousemove", this._onMouseMove);
     window.removeEventListener("click", this._onClick);
 
+    this._hudWin.classList.add("hidden");
     this._hud.hidden = true;
 
+    MusicManager.instance.stop();
     if (this.paused) Time.instance.timeScale = 1;
 
     Bullet.pool.length = 0;
@@ -218,6 +239,12 @@ class GameScene {
     img.alt = this.paused ? "Play" : "Pause";
     this._btnPlayPause.title = this.paused ? "Play" : "Pause";
     MusicManager.instance.muffle(this.paused);
+  }
+
+  _showWin() {
+    if (!this.paused) this._togglePause();
+    MusicManager.instance.stop();
+    this._hudWin.classList.remove("hidden");
   }
 
   _toggleHelp() {
@@ -311,6 +338,10 @@ class GameScene {
           pawn.mesh.removeFromParent();
         }
         this.pawns.splice(i, 1);
+        if (pawn === this._stronghold) {
+          this._showWin();
+          return;
+        }
       }
     }
 

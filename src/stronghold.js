@@ -11,7 +11,7 @@ class Stronghold extends Pawn {
     this.description = "Destroy it to win!";
     this.camera = camera;
 
-    this.maxLife = 10;
+    this.maxLife = 3;
     this.life = this.maxLife;
 
     this._spriteCanvas = document.createElement("canvas");

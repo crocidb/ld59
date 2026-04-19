@@ -4,6 +4,7 @@ class MusicManager {
   constructor() {
     this._sound = null;
     this._lowPassFilter = null;
+    this._filterAdded = false;
     this._muffled = false;
     this._playing = false;
     this._onFirstInteraction = this._onFirstInteraction.bind(this);
@@ -18,7 +19,7 @@ class MusicManager {
     }
 
     this._lowPassFilter = new Pizzicato.Effects.LowPassFilter({
-      frequency: 350,
+      frequency: 22050,
       peak: 10
     });
 
@@ -30,6 +31,12 @@ class MusicManager {
 
   _attemptPlay() {
     if (this._playing) return;
+    // Add the filter once, before the first play, while the sound is not yet playing.
+    // Changing it later is done via frequency only — never addEffect/removeEffect on a live sound.
+    if (!this._filterAdded) {
+      this._sound.addEffect(this._lowPassFilter);
+      this._filterAdded = true;
+    }
     try {
       const result = this._sound.play();
       if (result && typeof result.then === 'function') {
@@ -63,21 +70,25 @@ class MusicManager {
   }
 
   muffle(enable) {
-    if (!this._sound) return;
+    if (!this._lowPassFilter) return;
     if (enable === this._muffled) return;
-    if (enable) {
-      this._sound.addEffect(this._lowPassFilter);
-    } else {
-      this._sound.removeEffect(this._lowPassFilter);
-    }
+    this._lowPassFilter.frequency = enable ? 350 : 22050;
     this._muffled = enable;
+  }
+
+  play() {
+    if (!this._sound) return;
+    this.muffle(false);
+    this._attemptPlay();
   }
 
   stop() {
     if (this._sound && this._playing) {
-      this._sound.stop();
+      try { this._sound.stop(); } catch (e) { /* node not ready */ }
       this._playing = false;
     }
+    this._muffled = false;
+    if (this._lowPassFilter) this._lowPassFilter.frequency = 22050;
     window.removeEventListener('click', this._onFirstInteraction);
     window.removeEventListener('keydown', this._onFirstInteraction);
   }
