@@ -134,9 +134,9 @@ class GameScene {
               if (emitter.type === 1) {
                 canon.fire();
               } else if (emitter.type === 2) {
-                console.log("Canon received move signal");
+                canon.move();
               } else if (emitter.type === 3) {
-                console.log("Canon received rotate signal");
+                canon.rotate();
               }
             }
           }

@@ -1,19 +1,27 @@
 import * as THREE from "three";
 
-import Pawn, { SIGNAL_LABELS, SIGNAL_BG_COLORS, signalImages } from "./pawn.js";
+import Pawn, { SIGNAL_LABELS, SIGNAL_COLORS, SIGNAL_BG_COLORS, signalImages } from "./pawn.js";
 import Time from "./time.js";
 import Bullet from "./bullet.js";
 import ParticleSystem from "./particles.js"
 
 import * as utils from "./utils.js";
 
+const ORIENTATIONS = [
+  { rotY: 0,              velocity: new THREE.Vector3(0, 0, 6),  burstOffset: new THREE.Vector3(0, 0,  0.6) },
+  { rotY: 3 * Math.PI / 2, velocity: new THREE.Vector3(-6, 0, 0), burstOffset: new THREE.Vector3(-0.6, 0, 0) },
+  { rotY: Math.PI,        velocity: new THREE.Vector3(0, 0, -6), burstOffset: new THREE.Vector3(0, 0, -0.6) },
+  { rotY: Math.PI / 2,   velocity: new THREE.Vector3(6, 0, 0),  burstOffset: new THREE.Vector3( 0.6, 0, 0) },
+];
+
 class Canon extends Pawn {
-  constructor(scene, board, x, z, camera, receiverType = 1) {
+  constructor(scene, board, x, z, camera, receiverType = 1, orientation = 0) {
     super(board, "/assets/canon.glb", x, z);
     this.scene = scene;
     this.camera = camera;
     this.name = "Canon";
     this.receiverType = receiverType;
+    this.orientation = orientation;
 
     this.initialScaleY = 0.6;
     this.flashIntensity = 0;
@@ -72,21 +80,32 @@ class Canon extends Pawn {
     this._updateReceiverVisuals();
   }
 
+  move() {
+
+  }
+
+  rotate() {
+    this.orientation = (this.orientation + 1) % 4;
+    this.flashIntensity = 1.5;
+    this.mesh.scale.y = 1.2;
+    if (this.mesh) this.mesh.rotation.y = ORIENTATIONS[this.orientation].rotY;
+  }
+
   fire() {
     if (!this.mesh) return;
+
+    const { velocity, burstOffset } = ORIENTATIONS[this.orientation];
 
     const worldPos = new THREE.Vector3();
     this.mesh.getWorldPosition(worldPos);
     worldPos.y += 0.5;
 
-    const velocity = new THREE.Vector3(0, 0, 6);
-    if (this.mesh) this.mesh.scale.y = 0.5;
+    this.mesh.scale.y = 0.5;
+    this.flashIntensity = 1.5;
 
-    this.flashIntensity = 0.5;
+    ParticleSystem.instance.burst(this.mesh.position.clone().add(burstOffset), 30, .7, 1.0, 0xffaa55);
 
-    ParticleSystem.instance.burst(this.mesh.position.clone().add(new THREE.Vector3(0, 0, .6)), 30, .7, 1.0, 0xffaa55);
-
-    Bullet.get(this.scene, worldPos, velocity, 0.1, 3.0, this);
+    Bullet.get(this.scene, worldPos, velocity.clone(), 0.1, 3.0, this);
   }
 
   _update() {
@@ -94,6 +113,7 @@ class Canon extends Pawn {
 
     if (!this._spriteAttached) {
       this.mesh.add(this.sprite);
+      this.mesh.rotation.y = ORIENTATIONS[this.orientation].rotY;
       this._spriteAttached = true;
     }
 
@@ -102,7 +122,7 @@ class Canon extends Pawn {
     this.flashIntensity = utils.lerp(this.flashIntensity, 0, Time.instance.dt() * 9.0);
     this.mesh.traverse((child) => {
       if (child.isMesh && child.material) {
-        child.material.emissive = new THREE.Color(this.flashIntensity, this.flashIntensity, this.flashIntensity * .8);
+        child.material.emissive = new THREE.Color(SIGNAL_COLORS[this.receiverType]).multiplyScalar(this.flashIntensity);
       }
     });
 
