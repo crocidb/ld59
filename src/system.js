@@ -14,6 +14,7 @@ import ParticleSystem from "./particles.js"
 
 class System {
   constructor() {
+    System.instance = this;
     Input.instance.update();
 
     this.div = document.getElementById("gamediv");
@@ -63,11 +64,19 @@ class System {
     this.update();
   }
 
+  setScene(sceneFactory) {
+    if (this.currentScene?.exit) this.currentScene.exit();
+    const scene = sceneFactory();
+    this.currentScene = scene;
+    this.composer.passes[0] = new RenderPass(scene.scene, scene.camera);
+    this.resize();
+  }
+
   update() {
     Time.instance.update();
     ParticleSystem.instance.update();
 
-    if (!this.currentScene.paused) this.currentScene.update();
+    this.currentScene.update();
 
     this.crtPass.uniforms.time.value = Time.instance.total;
     this.composer.render();

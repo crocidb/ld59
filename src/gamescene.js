@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import System from "./system.js";
 import Input from "./input.js";
 import ParticleSystem from "./particles.js";
 import Board from "./board.js";
@@ -28,8 +29,10 @@ class GameScene {
     this._btnPlayPause = document.getElementById("btn_playpause");
     this._btnHelp = document.getElementById("btn_help");
     this._hudHelp = document.getElementById("hud_help");
+    this._hud = document.getElementById("hud");
 
     this.hudLevelTitle.innerHTML = this.currentLevel.name;
+    this._hud.hidden = false;
     this._setupControls();
 
     // CAMERA
@@ -89,13 +92,16 @@ class GameScene {
     this.mouse = new THREE.Vector2(-9999, -9999);
     this._pawnWorldPos = new THREE.Vector3();
 
-    window.addEventListener("mousemove", (e) => {
+    this._toggleHelp();
+
+    this._onMouseMove = (e) => {
       const rect = canvas.getBoundingClientRect();
       this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-    });
-
-    window.addEventListener("click", this._click.bind(this));
+    };
+    this._onClick = this._click.bind(this);
+    window.addEventListener("mousemove", this._onMouseMove);
+    window.addEventListener("click", this._onClick);
   }
 
   resize(w, h) {
@@ -152,13 +158,40 @@ class GameScene {
   }
 
   _setupControls() {
-    this._btnPlayPause.addEventListener("click", () => this._togglePause());
-    document.getElementById("btn_restart").addEventListener("click", () => this.reset());
-    this._btnHelp.addEventListener("click", () => this._toggleHelp());
+    this._onPlayPause = () => this._togglePause();
+    this._onRestart = () => System.instance.setScene(() => new GameScene(this.canvas));
+    this._onHelp = () => this._toggleHelp();
+
+    this._btnPlayPause.addEventListener("click", this._onPlayPause);
+    document.getElementById("btn_restart").addEventListener("click", this._onRestart);
+    this._btnHelp.addEventListener("click", this._onHelp);
+  }
+
+  exit() {
+    this._btnPlayPause.removeEventListener("click", this._onPlayPause);
+    document.getElementById("btn_restart").removeEventListener("click", this._onRestart);
+    this._btnHelp.removeEventListener("click", this._onHelp);
+    window.removeEventListener("mousemove", this._onMouseMove);
+    window.removeEventListener("click", this._onClick);
+
+    this._hud.hidden = true;
+
+    if (this.paused) Time.instance.timeScale = 1;
+
+    Bullet.pool.length = 0;
+
+    this.scene.traverse((obj) => {
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) {
+        if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+        else obj.material.dispose();
+      }
+    });
   }
 
   _togglePause() {
     this.paused = !this.paused;
+    Time.instance.timeScale = this.paused ? 0 : 1;
     const img = this._btnPlayPause.querySelector("img");
     img.src = this.paused ? "assets/sprites/play-button.svg" : "assets/sprites/pause-button.svg";
     img.alt = this.paused ? "Play" : "Pause";
@@ -170,38 +203,6 @@ class GameScene {
     this._hudHelp.classList.toggle("hidden", !this._helpVisible);
     if (this._helpVisible && !this.paused) this._togglePause();
     else if (!this._helpVisible && this.paused) this._togglePause();
-  }
-
-  reset() {
-    if (this._helpVisible) this._toggleHelp();
-    if (this.paused) this._togglePause();
-
-    for (const pawn of this.pawns) {
-      if (pawn.mesh) pawn.mesh.removeFromParent();
-    }
-    this.pawns = [];
-    Bullet.pool.length = 0;
-    ParticleSystem.instance.init(this.scene);
-
-    this.board.board.removeFromParent();
-    this.board = new Board(this.currentLevel.board.width, this.currentLevel.board.height);
-    this.scene.add(this.board.board);
-
-    for (const e of this.currentLevel.emitters) {
-      this.pawns.push(new Emitter(this.scene, this.board, e.x, e.y, e.type, e.rate, this.camera));
-    }
-    for (const c of this.currentLevel.canons) {
-      this.pawns.push(new Canon(this.scene, this.board, c.x, c.y, this.camera, c.receiver ?? 1));
-    }
-    for (const c of (this.currentLevel.enemyCanons ?? [])) {
-      this.pawns.push(new EnemyCanon(this.scene, this.board, c.x, c.y, this.camera, c.receiver ?? 1, c.orientation ?? 2));
-    }
-
-    this._cameraBasePosition.copy(this.camera.position);
-    this._shakeIntensity = 0;
-    this._shakeDuration = 0;
-    this._fitCameraToBoard(this.currentLevel.board.width, this.currentLevel.board.height);
-    this.currentSelected = null;
   }
 
   _click(e) {

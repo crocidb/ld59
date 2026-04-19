@@ -45,18 +45,18 @@ class ParticleSystem {
       0.4,
       (p) => {
         p.velocity = new THREE.Vector3(
-          utils.randrange(-0.1 * spread, 0.1 * spread) * speed,
-          0.3 * speed,
-          utils.randrange(-0.1 * spread, 0.1 * spread) * speed,
+          utils.randrange(-6 * spread, 6 * spread) * speed,
+          18 * speed,
+          utils.randrange(-6 * spread, 6 * spread) * speed,
         );
       },
-      (p) => {
-        p.position.add(p.velocity);
+      (p, dt) => {
+        p.position.addScaledVector(p.velocity, dt);
 
-        if (p.velocity.length() > 0.09) {
-          p.velocity.multiplyScalar(0.55);
+        if (p.velocity.length() > 5.4) {
+          p.velocity.multiplyScalar(Math.pow(0.55, dt * 60));
         } else {
-          p.velocity.multiplyScalar(0.97);
+          p.velocity.multiplyScalar(Math.pow(0.97, dt * 60));
         }
       },
     );
@@ -154,7 +154,7 @@ class Particle {
     if (this.lifetime <= 0) this.destroy();
     if (!this.active) return;
 
-    if (this.updateFunction != null) this.updateFunction(this);
+    if (this.updateFunction != null) this.updateFunction(this, Time.instance.dt());
   }
 
   destroy() {
