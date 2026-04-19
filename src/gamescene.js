@@ -7,6 +7,7 @@ import Canon from "./canon.js";
 import EnemyCanon from "./enemycanon.js";
 import Bullet from "./bullet.js";
 import LEVEL_DATA from "./level.js";
+import Time from "./time.js";
 
 class GameScene {
   constructor(canvas) {
@@ -33,6 +34,9 @@ class GameScene {
       100,
     );
     this.camera.lookAt(0, 0, 0);
+    this._cameraBasePosition = new THREE.Vector3();
+    this._shakeIntensity = 0;
+    this._shakeDuration = 0;
 
     // LIGHT
     this.ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
@@ -105,7 +109,40 @@ class GameScene {
     const distForDepth = halfCamZ / Math.tan(vFov / 2) + halfCamZ * Math.SQRT2;
     const D = Math.max(distForWidth, distForDepth) * 1.1;
     this.camera.position.set(0, D / Math.SQRT2, -D / Math.SQRT2);
+    this._cameraBasePosition.copy(this.camera.position);
     this.camera.lookAt(0, 0, 0);
+  }
+
+  shakeCamera(intensity, duration) {
+    this._shakeIntensity = intensity;
+    this._shakeDuration = duration;
+  }
+
+  _updateShake() {
+    const dt = Time.instance.dt();
+
+    this._shakeDuration = THREE.MathUtils.lerp(this._shakeDuration, 0, 8 * dt);
+
+    if (this._shakeDuration < 0.01) {
+      this._shakeIntensity = THREE.MathUtils.lerp(this._shakeIntensity, 0, 10 * dt);
+    }
+
+    if (this._shakeIntensity > 0.001) {
+      const forward = new THREE.Vector3();
+      this.camera.getWorldDirection(forward);
+      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+      const up = new THREE.Vector3().crossVectors(right, forward).normalize();
+
+      const ox = (Math.random() * 2 - 1) * this._shakeIntensity;
+      const oy = (Math.random() * 2 - 1) * this._shakeIntensity;
+
+      this.camera.position
+        .copy(this._cameraBasePosition)
+        .addScaledVector(right, ox)
+        .addScaledVector(up, oy);
+    } else {
+      this.camera.position.copy(this._cameraBasePosition);
+    }
   }
 
   _click(e) {
@@ -119,6 +156,8 @@ class GameScene {
   }
 
   update() {
+    this._updateShake();
+
     if (Input.instance.iskeydown(Input.SPACE)) {
       ParticleSystem.instance.burst(new THREE.Vector3(0, 0, 0), 250, 1.2, 1.0);
     }
@@ -172,7 +211,8 @@ class GameScene {
           bullet.active = false;
           this.scene.remove(bullet.mesh);
           pawn.takeDamage(1);
-          ParticleSystem.instance.burst(bullet.position.clone(), 15, 0.5, 0.8, 0xff4400);
+          this.shakeCamera(0.1, 0.01);
+          ParticleSystem.instance.burst(bullet.position.clone(), 50, 4.5, 0.07, 0xff4400);
         }
       }
     }
@@ -181,7 +221,8 @@ class GameScene {
       const pawn = this.pawns[i];
       if (pawn.isDead()) {
         if (pawn.mesh) {
-          ParticleSystem.instance.burst(pawn.mesh.position.clone(), 60, 1.0, 1.2, 0xff6600);
+          ParticleSystem.instance.burst(pawn.mesh.position.clone(), 180, 2.0, .1, 0xff6600);
+          this.shakeCamera(0.3, 0.1);
           this.scene.remove(pawn.mesh);
         }
         this.pawns.splice(i, 1);
