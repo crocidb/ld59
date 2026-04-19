@@ -8,6 +8,7 @@ import Canon from "./canon.js";
 import { SIGNAL_SPRITE_SRCS } from "./pawn.js";
 import EnemyCanon from "./enemycanon.js";
 import Stronghold from "./stronghold.js";
+import Wall from "./wall.js";
 import Bullet from "./bullet.js";
 import LEVEL_DATA from "./level.js";
 import Time from "./time.js";
@@ -106,6 +107,9 @@ class GameScene {
       const s = this.currentLevel.stronghold;
       this._stronghold = new Stronghold(this.board, s.x, s.y, this.camera);
       this.pawns.push(this._stronghold);
+    }
+    for (const w of (this.currentLevel.walls ?? [])) {
+      this.pawns.push(new Wall(this.board, w.x, w.y));
     }
 
     this.raycaster = new THREE.Raycaster();
@@ -326,9 +330,10 @@ class GameScene {
         if (dist < bullet.radius + 0.4) {
           bullet.active = false;
           this.scene.remove(bullet.mesh);
-          pawn.takeDamage(1);
+          const isWall = pawn instanceof Wall;
+          if (!isWall) pawn.takeDamage(1);
           this.shakeCamera(0.1, 0.01);
-          ParticleSystem.instance.burst(bullet.position.clone(), 50, 4.5, -0.07, 0xff4400);
+          ParticleSystem.instance.burst(bullet.position.clone(), 50, 4.5, -0.07, isWall ? 0x888888 : 0xff4400);
         }
       }
     }

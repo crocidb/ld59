@@ -62,7 +62,7 @@ const mobile = () => navigator.userAgent.match("Mobile");
 // Audio stuff
 let AUDIO = true;
 let AUDIO_VOLUME = 10.0;
-const SFX_VOLUME = 0.02;
+const SFX_VOLUME = 0.01;
 const playaudiodelay = (a, d) => {
   setTimeout(() => playaudio(a), d);
 };
