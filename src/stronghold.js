@@ -6,7 +6,7 @@ import Time from "./time.js";
 
 class Stronghold extends Pawn {
   constructor(board, x, y, camera) {
-    super(board, "/assets/stronghold.glb", x, y);
+    super(board, "assets/stronghold.glb", x, y);
     this.name = "Enemy Stronghold";
     this.description = "Destroy it to win!";
     this.camera = camera;

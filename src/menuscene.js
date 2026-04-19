@@ -58,7 +58,7 @@ class MenuScene {
 
   _loadStronghold() {
     const loader = new GLTFLoader();
-    loader.load('/assets/stronghold.glb', (gltf) => {
+    loader.load('assets/stronghold.glb', (gltf) => {
       this._stronghold = gltf.scene;
       this._stronghold.traverse((child) => {
         if (child.isMesh) {
@@ -94,7 +94,7 @@ class MenuScene {
   }
 
   _onStartClick() {
-    const savedLevel = parseInt(localStorage.getItem("currentLevel") ?? "0", 10);
+    const savedLevel = parseInt((() => { try { return localStorage.getItem("currentLevel"); } catch(e) { return null; } })() ?? "0", 10);
     const startLevel = isNaN(savedLevel) ? 0 : savedLevel;
     System.instance.setScene(() => new GameScene(System.instance.renderer.domElement, startLevel));
   }

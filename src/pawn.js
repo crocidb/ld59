@@ -6,10 +6,10 @@ import * as utils from "./utils.js";
 export const SIGNAL_LABELS = ["Disabled", "Shoot", "Move", "Rotate"];
 export const SIGNAL_COLORS = [0x888888, 0x55ddff, 0x55ffaa, 0xff7799];
 export const SIGNAL_SPRITE_SRCS = [
-  "/assets/sprites/split-cross.png",
-  "/assets/sprites/cannon-shot.png",
-  "/assets/sprites/move.png",
-  "/assets/sprites/cycle.png",
+  "assets/sprites/split-cross.png",
+  "assets/sprites/cannon-shot.png",
+  "assets/sprites/move.png",
+  "assets/sprites/cycle.png",
 ];
 export const SIGNAL_BG_COLORS = [
   "rgba(40, 40, 40, 0.9)",

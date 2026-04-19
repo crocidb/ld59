@@ -23,7 +23,7 @@ const ORIENTATION_DELTAS = [
 
 class Canon extends Pawn {
   constructor(scene, board, x, z, camera, receiverType = 1, orientation = 0) {
-    super(board, "/assets/canon.glb", x, z);
+    super(board, "assets/canon.glb", x, z);
     this.scene = scene;
     this.camera = camera;
     this.name = "Canon";

@@ -1,13 +1,13 @@
 @font-face {
   font-family: 'OdibeeSans';
-  src: url('/assets/OdibeeSans-Regular.ttf') format('truetype');
+  src: url('assets/OdibeeSans-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Gelasio';
-  src: url('/assets/Gelasio-VariableFont_wght.ttf') format('truetype');
+  src: url('assets/Gelasio-VariableFont_wght.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
 }
@@ -42,8 +42,9 @@ canvas {
 
 #gamediv {
   position: relative;
-  width: 1280px;
-  height: 768px;
+  aspect-ratio: 1280 / 768;
+  width: min(1280px, 100vw);
+  max-height: 100vh;
 }
 
 @media (pointer: coarse) {
@@ -357,7 +358,7 @@ canvas {
   font-size: 5rem;
   color: #eeeed2;
   margin: 0;
-  margin-top: -350px;
+  margin-top: -100px;
   letter-spacing: 0.15em;
   -webkit-text-stroke: 20px #769656;
   paint-order: stroke fill;

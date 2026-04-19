@@ -9,7 +9,7 @@ import * as utils from "./utils.js";
 
 class Emitter extends Pawn {
   constructor(scene, board, x, y, type, rate, camera) {
-    super(board, "/assets/emitter.glb", x, y);
+    super(board, "assets/emitter.glb", x, y);
     this.name = "Emitter";
     this.description = "";
     this.type = type;

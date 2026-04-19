@@ -1,6 +1,12 @@
-# LD59
+# Remote Tactical Wars
 
-This is the game for Ludum Dare 59.
+**Remote Tactical Wars** is a tactical puzzle game where your pieces on the board will communicate via **Signals**. You're goal is to destroy the enemy's **Stronghold**. Use your **Canons** by selecting which type of **Signal** it can receive:
+
+ - **Shoot**: when receiving the blue signal, the cannon will **Shoot**
+ - **Rotate**: the red signal means **Rotate**
+ - **Move Ahead**: the green signal will make your Canon move one square forward, to the direction it's facing
+
+Any piece, except the **Wall** can be destroyed. Sometimes, the way forward means destroying ally pieces.
 
 ## Development mode
 

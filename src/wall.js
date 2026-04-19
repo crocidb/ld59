@@ -9,7 +9,7 @@ const ORIENTATIONS = [
 
 class Wall extends Pawn {
   constructor(board, x, y, orientation = 0) {
-    super(board, "/assets/wall.glb", x, y);
+    super(board, "assets/wall.glb", x, y);
     this.name = "Wall";
     this.description = "Can't take any damage";
     this.orientation = orientation;
