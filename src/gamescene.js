@@ -4,6 +4,7 @@ import ParticleSystem from "./particles.js";
 import Board from "./board.js";
 import Emitter from "./emitter.js";
 import Canon from "./canon.js";
+import EnemyCanon from "./enemycanon.js";
 import Bullet from "./bullet.js";
 import LEVEL_DATA from "./level.js";
 
@@ -69,6 +70,9 @@ class GameScene {
     }
     for (const c of this.currentLevel.canons) {
       this.pawns.push(new Canon(this.scene, this.board, c.x, c.y, this.camera, c.receiver ?? 1));
+    }
+    for (const c of (this.currentLevel.enemyCanons ?? [])) {
+      this.pawns.push(new EnemyCanon(this.scene, this.board, c.x, c.y, this.camera, c.receiver ?? 1, c.orientation ?? 2));
     }
 
     this.raycaster = new THREE.Raycaster();
